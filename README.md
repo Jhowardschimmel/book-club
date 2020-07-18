@@ -4,3 +4,5 @@ An application to manage book clubs made with create-react-app, reactstrap and d
 **Work In Progress**
 
 [AWS-Amplify-Deployment](https://master.d3ghrbf69ms0s4.amplifyapp.com/)
+
+Home "/" and SearchPage "/search" client routes now set up.
