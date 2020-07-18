@@ -1,16 +1,21 @@
 import React from "react";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer/Footer";
 import Button from "./components/Button";
-import Main from "./components/pages/Main";
+import Home from "./components/pages/Home";
+import SearchPage from "./components/pages/SearchPage";
 // import "./styles/base.css";
 
 function App() {
 	return (
-		<>
-			<Main />
-		</>
+		<Router>
+			<>
+			<Route exact path="/" component={Home} />
+			<Route exact path="/search" component={SearchPage} />
+			</>
+		</Router>
 	);
 }
 

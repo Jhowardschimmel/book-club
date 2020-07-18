@@ -72,7 +72,7 @@ export default class Navigation extends React.Component {
 									Nominate
                   </DropdownItem>
 								<DropdownItem divider />
-								<DropdownItem>
+								<DropdownItem href="/search">
 									Search
                   </DropdownItem>
 							</DropdownMenu>
