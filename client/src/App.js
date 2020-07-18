@@ -1,4 +1,5 @@
 import React from "react";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer/Footer";
@@ -9,10 +10,12 @@ import SearchPage from "./components/pages/SearchPage";
 
 function App() {
 	return (
-		<>
-		    <Home />
-			<SearchPage />
-		</>
+		<Router>
+			<>
+			<Route exact path="/" component={Home} />
+			<Route exact path="/search" component={SearchPage} />
+			</>
+		</Router>
 	);
 }
 
