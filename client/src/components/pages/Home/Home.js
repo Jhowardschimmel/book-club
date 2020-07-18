@@ -8,9 +8,9 @@ import {
 import Navigation from "../../Navigation";
 import Header from "../../Header";
 import Footer from "../../Footer";
-import Search from "../Search";
 
-export default class Main extends React.Component {
+
+export default class Home extends React.Component {
 
     render() {
         return (
@@ -23,11 +23,6 @@ export default class Main extends React.Component {
                 <Row>
                     <Col sm="12 d-flex justify-content-center">
                         <Header />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                    <Search/>
                     </Col>
                 </Row>
                 <Row>
