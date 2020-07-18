@@ -5,8 +5,10 @@ import {
     Container,
     Row
 } from "reactstrap";
-import Navigation from "../Navigation";
-import Footer from "../Footer";
+import Navigation from "../../Navigation";
+import Header from "../../Header";
+import Footer from "../../Footer";
+import Search from "../Search";
 
 export default class Main extends React.Component {
 
@@ -20,7 +22,12 @@ export default class Main extends React.Component {
                 </Row>
                 <Row>
                     <Col sm="12 d-flex justify-content-center">
-                        Welcome!
+                        <Header />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                    <Search/>
                     </Col>
                 </Row>
                 <Row>
