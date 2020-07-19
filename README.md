@@ -15,4 +15,4 @@ July 19th 2020
 Added functionality to hit the google books api on compomnentDidMount on the SearchPage 
 
 
-[Google Books API on load] (https://drive.google.com/file/d/1YV8IJORcMr6Cwkd7YAE5U_kiVkWl5__J/view)
+[Google Books API on load](https://drive.google.com/file/d/1YV8IJORcMr6Cwkd7YAE5U_kiVkWl5__J/view)
