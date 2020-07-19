@@ -12,7 +12,7 @@ Home "/" and SearchPage "/search" client routes now
 [basic client routing](https://drive.google.com/file/d/1ko3YiuScsLRZX7K5vafv9btGAMpD4VPs/view)
 
 July 19th 2020
-Added functionality to hit the google books api on compomnentDidMount on the SearchPage 
+Added functionality to hit the Google Books API on compomnentDidMount on the SearchPage 
 
 
 [Google Books API on load](https://drive.google.com/file/d/1YV8IJORcMr6Cwkd7YAE5U_kiVkWl5__J/view)
