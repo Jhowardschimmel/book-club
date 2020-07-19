@@ -4,7 +4,11 @@ const BASEURL = "https://www.omdbapi.com/?t=";
 const APIKEY = "&apikey=trilogy";
 
 export default {
-  search: function(query) {
+  getTheHobbit: function() {
+    return axios.get("https://www.googleapis.com/books/v1/volumes?q=the%hobbit");
+  },
+
+  get: function(query) {
     return axios.get(BASEURL + query + APIKEY);
   }
 };
