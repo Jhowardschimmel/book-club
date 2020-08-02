@@ -11,21 +11,26 @@ import {
 } from "reactstrap";
 export default class Search extends React.Component {
 
-    render() {
-        return (
-            <Form>
-                <FormGroup>
-                    <Label for="exampleSearch">Search For A Book</Label>
-                    <Input
-                        type="search"
-                        name="search"
-                        id="exampleSearch"
-                        placeholder="The Hobbit"
-                    />
-                </FormGroup>
-            </Form>
+  constructor(props) {
+    super(props)
+  }
+
+  render() {
+      return (
+          <Form>
+              <FormGroup>
+                  <Label for="exampleSearch">Search For A Book</Label>
+                  <Input
+                      type="search"
+                      name="search"
+                      id="exampleSearch"
+                      placeholder="The Hobbit"
+                      onChange={this.props.setSearchInput}
+                  />
+              </FormGroup>
+          </Form>
 
 
-        )
-    }
+      )
+  }
 }
