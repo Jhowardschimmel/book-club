@@ -1,72 +1,117 @@
 import React from "react";
-import API from "../../../utils/API";
-import { Fragment } from 'react';
-import {
-    Col,
-    Container,
-    Row
-} from "reactstrap";
-import Card from "../../Card";
-import Navigation from "../../Navigation";
-import Header from "../../Header";
-import Search from "../../Search";
-import Footer from "../../Footer";
+import { Fragment } from "react";
+import { Col, Container, Row } from "reactstrap";
+import { debounce } from "lodash";
+
+import API from "utils/API";
+import Card from "components/Card";
+import Navigation from "components/Navigation";
+import Header from "components/Header";
+import Search from "components/Search";
+import Footer from "components/Footer";
 
 export default class SearchPage extends React.Component {
-    state = {
-        search: "",
-        results: [],
-        error: "",
-        title: "",
-        imageLink: "",
-        description: "",
-        authors: ""
-    };
+  state = {
+    search: "",
+    results: [],
+    resultsTotalLength: 0,
+    error: "",
+    title: "",
+    imageLink: "",
+    description: "",
+    authors: "",
+  };
 
-    componentDidMount() {
-        API.getTheHobbit().then(res => this.setState({
-            results: res,
-            title: res.data.items[0].volumeInfo.title,
-            imageLink: res.data.items[0].volumeInfo.imageLinks.thumbnail,
-            description: res.data.items[0].volumeInfo.description,
-            authors: res.data.items[0].volumeInfo.authors
-        }))
+  constructor(props) {
+    super(props);
+    this.setSearchInput = this.setSearchInput.bind(this);
+  }
+
+  async componentDidMount() {
+    const searchResponse = await API.searchBooks();
+    const results = searchResponse.data.items;
+    this.setState({
+      results,
+    });
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    if (this.state.search !== prevState.search) {
+      const searchQuery = this.state.search;
+      const searchResponse = await API.searchBooks(searchQuery);
+      const results = searchResponse.data.items;
+      this.setState({
+        results,
+      });
     }
+  }
 
-    render() {
+  setSearchInput(e) {
+    e.persist();
+
+    const debouncedSearch = this.setDebouncedSearch(e);
+    debouncedSearch();
+  }
+
+  setDebouncedSearch(e) {
+    const setSearchDebounced = debounce(() => {
+      const search = e.target.value;
+      this.setState({
+        search,
+      });
+    }, 300);
+    return setSearchDebounced;
+  }
+
+  makeSearchDisplay() {
+    if (this.state.results) {
+      const searchDisplay = this.state.results.map((res, index) => {
+        const thumbnail = res.volumeInfo.imageLinks
+          ? res.volumeInfo.imageLinks.thumbnail
+          : "http://www.fillmurray.com/128/188";
         return (
-            <Fragment>
-                <Container>
-                    <Row>
-                        <Col sm="12">
-                            <Navigation />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col sm="12 d-flex justify-content-center">
-                            <Header />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col sm="12">
-                            <Card title = {this.state.title}
-                            imageLink = {this.state.imageLink}
-                            authors = {this.state.authors} description = {this.state.description} />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col sm="12">
-                            <Search></Search>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col sm="12">
-                            <Footer />
-                        </Col>
-                    </Row>
-                </Container>
-            </Fragment>
-        )
+          <Card
+            title={res.volumeInfo.title}
+            thumbnail={thumbnail}
+            authors={res.volumeInfo.authors}
+            description={res.volumeInfo.description}
+            key={index}
+          />
+        );
+      });
+      return searchDisplay;
     }
+  }
 
+  render() {
+    return (
+      <Fragment>
+        <Container>
+          <Row>
+            <Col sm="12">
+              <Navigation />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm="12 d-flex justify-content-center">
+              <Header />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm="12">
+              <Search setSearchInput={this.setSearchInput} />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm="12">{this.makeSearchDisplay()}</Col>
+          </Row>
+          <Row>
+            <Col sm="12">
+              <Footer />
+            </Col>
+          </Row>
+        </Container>
+      </Fragment>
+    );
+  }
 }
