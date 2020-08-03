@@ -2,6 +2,7 @@ import React from "react";
 import { Fragment } from "react";
 import { Col, Container, Row } from "reactstrap";
 import { debounce } from "lodash";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import API from "utils/API";
 import Card from "components/Card";
@@ -15,16 +16,19 @@ export default class SearchPage extends React.Component {
     search: "",
     results: [],
     resultsTotalLength: 0,
+    currentPage: 0,
     error: "",
     title: "",
     imageLink: "",
     description: "",
     authors: "",
+    hasMore: true,
   };
 
   constructor(props) {
     super(props);
     this.setSearchInput = this.setSearchInput.bind(this);
+    this.searchNext = this.searchNext.bind(this);
   }
 
   async componentDidMount() {
@@ -39,9 +43,25 @@ export default class SearchPage extends React.Component {
     if (this.state.search !== prevState.search) {
       const searchQuery = this.state.search;
       const searchResponse = await API.searchBooks(searchQuery);
-      const results = searchResponse.data.items;
+      const results = searchResponse.data.items
+        ? searchResponse.data.items
+        : [];
+      const resultsTotalLength = searchResponse.data.totalItems
+        ? searchResponse.data.totalItems
+        : 0;
       this.setState({
         results,
+        resultsTotalLength,
+        currentPage: 0,
+        hasMore: true,
+      });
+    }
+    if (
+      this.state.hasMore &&
+      this.state.results.length === this.state.resultsTotalLength
+    ) {
+      this.setState({
+        hasMore: false,
       });
     }
   }
@@ -61,6 +81,20 @@ export default class SearchPage extends React.Component {
       });
     }, 300);
     return setSearchDebounced;
+  }
+
+  async searchNext() {
+    const pageIncrement = 10;
+    const currentPage = this.state.currentPage + pageIncrement;
+    const nextResults = await API.searchBooks(this.state.search, currentPage);
+    const nextResultsDataItems = nextResults.data.items
+      ? nextResults.data.items
+      : [];
+    const results = [...this.state.results, ...nextResultsDataItems];
+    this.setState({
+      results,
+      currentPage,
+    });
   }
 
   makeSearchDisplay() {
@@ -111,7 +145,19 @@ export default class SearchPage extends React.Component {
             </Col>
           </Row>
           <Row>
-            <Col sm="12">{this.makeSearchDisplay()}</Col>
+            <InfiniteScroll
+              dataLength={this.state.results.length}
+              next={this.searchNext}
+              hasMore={this.state.hasMore}
+              loader={<h4>Loading...</h4>}
+              endMessage={
+                <p style={{ textAlign: "center" }}>
+                  <b>No More Books To Display!</b>
+                </p>
+              }
+            >
+              <Col sm="12">{this.makeSearchDisplay()}</Col>
+            </InfiniteScroll>
           </Row>
           <Row>
             <Col sm="12">

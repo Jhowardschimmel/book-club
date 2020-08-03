@@ -20,7 +20,8 @@ export default {
       terms = "the%hobbit";
     }
     const pages = pagination ? `&startIndex=${pagination}` : "";
-    const query = `/volumes?q=${terms}${pages}${FILTERRESULTS}`;
+    const maxIndex = "&maxIndex=10";
+    const query = `/volumes?q=${terms}${maxIndex}${pages}${FILTERRESULTS}`;
     return axiosClient.get(query);
   },
 
