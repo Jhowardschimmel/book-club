@@ -81,6 +81,14 @@ export default class SearchPage extends React.Component {
       });
       return searchDisplay;
     }
+    return (
+      <Card
+        title={"A Book For No Matching Search Results"}
+        thumbnail="http://www.fillmurray.com/128/188"
+        authors="Bill Murray"
+        description="The book for you when there are no other matching books."
+      />
+    );
   }
 
   render() {
