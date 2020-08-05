@@ -31,6 +31,7 @@ export default class SearchPage extends React.Component {
     super(props);
     this.setSearchDebounced = debounce(this.setSearch, 300);
     this.handleSearch = this.handleSearch.bind(this);
+    this.searchNext = this.searchNext.bind(this);
   }
 
   async componentDidMount() {
