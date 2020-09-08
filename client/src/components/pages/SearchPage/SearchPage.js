@@ -1,7 +1,9 @@
 import React from "react";
 import { Fragment } from "react";
-import { Col, Container, Row } from "reactstrap";
+import { Col, Container, Row, Spinner } from "reactstrap";
 import { debounce } from "lodash";
+
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import API from "utils/API";
 import Card from "components/Card";
@@ -15,16 +17,21 @@ export default class SearchPage extends React.Component {
     search: "",
     results: [],
     resultsTotalLength: 0,
+    currentPage: 0,
     error: "",
     title: "",
     imageLink: "",
     description: "",
     authors: "",
+    hasMore: true,
+    loading: false,
   };
 
   constructor(props) {
     super(props);
-    this.setSearchInput = this.setSearchInput.bind(this);
+    this.setSearchDebounced = debounce(this.setSearch, 300);
+    this.handleSearch = this.handleSearch.bind(this);
+    this.searchNext = this.searchNext.bind(this);
   }
 
   async componentDidMount() {
@@ -38,33 +45,81 @@ export default class SearchPage extends React.Component {
   async componentDidUpdate(prevProps, prevState) {
     if (this.state.search !== prevState.search) {
       const searchQuery = this.state.search;
-      const searchResponse = await API.searchBooks(searchQuery);
-      const results = searchResponse.data.items;
+      try {
+        const searchResponse = await API.searchBooks(searchQuery);
+        const results = searchResponse.data.items
+          ? searchResponse.data.items
+          : [];
+        const resultsTotalLength = searchResponse.data.totalItems
+          ? searchResponse.data.totalItems
+          : 0;
+        this.setState({
+          results,
+          resultsTotalLength,
+          currentPage: 0,
+          hasMore: true,
+          loading: false,
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    if (
+      this.state.hasMore &&
+      this.state.results.length === this.state.resultsTotalLength
+    ) {
       this.setState({
-        results,
+        hasMore: false,
       });
     }
   }
 
-  setSearchInput(e) {
-    e.persist();
-
-    const debouncedSearch = this.setDebouncedSearch(e);
-    debouncedSearch();
+  componentWillUnmount() {
+    this.setSearchDebounced.cancel();
   }
 
-  setDebouncedSearch(e) {
-    const setSearchDebounced = debounce(() => {
-      const search = e.target.value;
-      this.setState({
-        search,
-      });
-    }, 300);
-    return setSearchDebounced;
+  setSearch(e) {
+    const search = e.target.value;
+    this.setState({
+      search,
+      loading: true,
+      results: [],
+    });
+  }
+
+  handleSearch(e) {
+    e.persist();
+    this.setSearchDebounced(e);
+  }
+
+  async searchNext() {
+    const pageIncrement = 10;
+    const currentPage = this.state.currentPage + pageIncrement;
+    const nextResults = await API.searchBooks(this.state.search, currentPage);
+    const nextResultsDataItems = nextResults.data.items
+      ? nextResults.data.items
+      : [];
+    const results = [...this.state.results, ...nextResultsDataItems];
+    const resultsTotalLength = nextResults.data.totalItems;
+    this.setState({
+      results,
+      currentPage,
+      resultsTotalLength,
+    });
+  }
+
+  showEndMessage() {
+    if (!this.state.loading) {
+      return (
+        <h4 style={{ textAlign: "center" }}>
+          <b>No More Books To Display!</b>
+        </h4>
+      );
+    }
   }
 
   makeSearchDisplay() {
-    if (this.state.results) {
+    if (this.state.results.length) {
       const searchDisplay = this.state.results.map((res, index) => {
         const thumbnail = res.volumeInfo.imageLinks
           ? res.volumeInfo.imageLinks.thumbnail
@@ -80,6 +135,16 @@ export default class SearchPage extends React.Component {
         );
       });
       return searchDisplay;
+    }
+    if (this.state.search && !this.state.loading) {
+      return (
+        <Card
+          title={"A Book For No Matching Search Results"}
+          thumbnail="http://www.fillmurray.com/128/188"
+          authors="Bill Murray"
+          description="The book for you when there are no other matching books."
+        />
+      );
     }
   }
 
@@ -99,11 +164,24 @@ export default class SearchPage extends React.Component {
           </Row>
           <Row>
             <Col sm="12">
-              <Search setSearchInput={this.setSearchInput} />
+              <Search setSearchInput={this.handleSearch} />
             </Col>
           </Row>
           <Row>
-            <Col sm="12">{this.makeSearchDisplay()}</Col>
+            <InfiniteScroll
+              dataLength={this.state.results.length}
+              next={this.searchNext}
+              hasMore={this.state.hasMore}
+              loader={
+                <Spinner
+                  style={{ width: "3rem", height: "3rem" }}
+                  type="grow"
+                />
+              }
+              endMessage={this.showEndMessage()}
+            >
+              <Col sm="12">{this.makeSearchDisplay()}</Col>
+            </InfiniteScroll>
           </Row>
           <Row>
             <Col sm="12">

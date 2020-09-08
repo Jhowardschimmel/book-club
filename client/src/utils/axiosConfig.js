@@ -12,5 +12,6 @@ axiosClient.interceptors.request.use(Interceptors.logRequest);
 
 //Register Response Interceptors
 axiosClient.interceptors.response.use(Interceptors.logResponse);
+axiosClient.interceptors.response.use(Interceptors.changeThumbToHTTPS);
 
 export default axiosClient;
